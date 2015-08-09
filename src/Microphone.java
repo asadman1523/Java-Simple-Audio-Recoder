@@ -20,10 +20,11 @@ public class Microphone {
 	private String errorMessage;
 	public boolean stopped;
 	private String time;
+	SocketClient socketClient;
 	public Microphone() {
 		// TODO Auto-generated constructor stub
 		format = new AudioFormat(AudioFormat.Encoding.PCM_SIGNED,
-				41000.0F, 16, 2, 4, 41000.0F, false);
+				16000.0F, 16, 2, 4, 16000.0F, false);
 		DataLine.Info info = new DataLine.Info(TargetDataLine
 				.class, format); // format is an AudioFormat object
 		
@@ -48,6 +49,8 @@ public class Microphone {
 	    if(!folder.exists()){
 	    	folder.mkdirs();
 	    }
+	    
+	    socketClient = new SocketClient();
 	}
 	
 	public void capture(String IP)
@@ -77,6 +80,8 @@ public class Microphone {
 		   numBytesRead =  line.read(data, 0, data.length);
 		   // Save this chunk of data.
 		   out.write(data, 0, numBytesRead);
+		   
+		   socketClient.sendRecord(data,numBytesRead);
 		}     
 		
 		String filePath = "C:\\asd\\"+time+"_to_"+IP+".pcm";
@@ -85,6 +90,8 @@ public class Microphone {
 			OutputStream outputStream = new FileOutputStream (filePath); 
 			out.writeTo(outputStream);
 			out.close();
+			
+			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
